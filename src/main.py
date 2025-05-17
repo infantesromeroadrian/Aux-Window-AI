@@ -108,6 +108,7 @@ def update_transcript():
 def get_suggestions():
     """Endpoint to get suggestions from the LLM based on transcribed text."""
     text = request.json.get('text', '')
+    language = request.json.get('language', 'es-ES')  # Default to Spanish if not specified
     
     # Actualizar la transcripción almacenada
     session_id = session.get('session_id')
@@ -122,8 +123,8 @@ def get_suggestions():
         })
     
     if openai_service:
-        logger.info(f"Getting suggestions for text: {text[:50]}...")
-        result = openai_service.get_suggestions(text)
+        logger.info(f"Getting suggestions for text: {text[:50]}... in language: {language}")
+        result = openai_service.get_suggestions(text, language)
         if not result.get('success'):
             logger.error(f"Error getting suggestions: {result.get('error')}")
         else:

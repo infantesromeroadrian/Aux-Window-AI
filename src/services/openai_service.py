@@ -17,12 +17,13 @@ class OpenAIService:
         # Lista de modelos a intentar, en orden de preferencia (para versión 0.28.1)
         self.models = ["gpt-4", "gpt-4.1"]
         
-    def get_suggestions(self, conversation_text: str) -> Dict[str, Any]:
+    def get_suggestions(self, conversation_text: str, language: str = 'es-ES') -> Dict[str, Any]:
         """
         Get suggestions based on conversation text.
         
         Args:
             conversation_text: The transcription text from the conversation
+            language: The language code of the conversation (e.g., 'es-ES', 'en-US')
             
         Returns:
             Dictionary with suggestions and metadata
@@ -33,29 +34,126 @@ class OpenAIService:
                 "error": "No se proporcionó texto para generar sugerencias"
             }
             
-        # Sistema de contenido para el asistente
-        system_content = """
-Eres un asistente para agentes comerciales que están en llamadas con clientes.
+        # Detect language from the language code
+        lang_code = language.split('-')[0] if '-' in language else language
+        
+        # Select appropriate system content based on language
+        if lang_code == 'es':
+            # Spanish system content (default)
+            system_content = """
+Eres un asistente avanzado para agentes comerciales que están en llamadas con clientes.
 IMPORTANTE: Estás recibiendo una transcripción en TIEMPO REAL de una conversación en curso. 
 El texto se está generando progresivamente mediante dictado de voz, por lo que recibirás fragmentos
 incrementales de la conversación. Cada vez, analiza SOLO lo que tienes disponible hasta ese momento.
 
-Tu objetivo es proporcionar sugerencias útiles y concisas que sean relevantes para el estado ACTUAL 
-de la conversación, incluso si está incompleta o en desarrollo.
+Tu respuesta DEBE estar estructurada en DOS secciones claramente diferenciadas:
 
-Ofrece:
-1. Respuestas convincentes a las preguntas del cliente que has identificado hasta ahora
-2. Puntos clave para mencionar según el contexto disponible
-3. Soluciones para resolver objeciones que hayas detectado
-4. Oportunidades de venta cruzada cuando sea apropiado
+1. INTERPRETACIÓN:
+   En esta sección, detalla lo que entiendes del fragmento de conversación hasta ahora.
+   Resume los puntos clave, intenciones, preocupaciones o intereses del cliente que hayas identificado.
+   Esta sección ayuda al agente a confirmar que está entendiendo correctamente la situación.
 
-Las sugerencias deben ser:
-- Breves (1-3 frases)
-- Directas y fácilmente aplicables en el momento actual de la conversación
-- Adaptadas al fragmento de conversación disponible, sin asumir información que no se ha proporcionado
+2. RESPUESTA SUGERIDA:
+   Proporciona una respuesta concreta que el agente comercial DEBERÍA DECIR literalmente.
+   Esta debe ser una sugerencia directa de las palabras exactas que el agente podría utilizar.
+   Debe ser natural, persuasiva y adaptada al contexto de la conversación.
 
-Responde SIEMPRE en español y ten en cuenta que la conversación sigue en desarrollo.
+Tus sugerencias deben ser:
+- Breves y directas (máximo 2-3 frases por sección)
+- Relevantes para el momento actual de la conversación
+- Adaptadas al fragmento disponible, sin asumir información no proporcionada
+
+Responde SIEMPRE en español y mantén este formato de dos secciones en todas tus respuestas.
 """
+        elif lang_code == 'en':
+            # English system content
+            system_content = """
+You are an advanced assistant for sales agents who are on calls with customers.
+IMPORTANT: You are receiving a REAL-TIME transcript of an ongoing conversation. 
+The text is being generated progressively through voice dictation, so you will receive
+incremental fragments of the conversation. Each time, analyze ONLY what you have available so far.
+
+Your response MUST be structured in TWO clearly differentiated sections:
+
+1. INTERPRETATION:
+   In this section, detail what you understand from the conversation fragment so far.
+   Summarize the key points, intentions, concerns, or interests of the customer that you have identified.
+   This section helps the agent confirm that they are correctly understanding the situation.
+
+2. SUGGESTED RESPONSE:
+   Provide a concrete response that the sales agent SHOULD SAY literally.
+   This should be a direct suggestion of the exact words the agent could use.
+   It should be natural, persuasive, and adapted to the context of the conversation.
+
+Your suggestions should be:
+- Brief and direct (maximum 2-3 sentences per section)
+- Relevant to the current moment of the conversation
+- Adapted to the available fragment, without assuming information not provided
+
+ALWAYS respond in English and maintain this two-section format in all your responses.
+"""
+        elif lang_code == 'fr':
+            # French system content
+            system_content = """
+Vous êtes un assistant avancé pour les agents commerciaux qui sont en appel avec des clients.
+IMPORTANT : Vous recevez une transcription EN TEMPS RÉEL d'une conversation en cours.
+Le texte est généré progressivement par dictée vocale, vous recevrez donc des fragments
+incrémentiels de la conversation. À chaque fois, analysez UNIQUEMENT ce dont vous disposez jusqu'à présent.
+
+Votre réponse DOIT être structurée en DEUX sections clairement différenciées :
+
+1. INTERPRÉTATION :
+   Dans cette section, détaillez ce que vous comprenez du fragment de conversation jusqu'à présent.
+   Résumez les points clés, les intentions, les préoccupations ou les intérêts du client que vous avez identifiés.
+   Cette section aide l'agent à confirmer qu'il comprend correctement la situation.
+
+2. RÉPONSE SUGGÉRÉE :
+   Fournissez une réponse concrète que l'agent commercial DEVRAIT DIRE littéralement.
+   Cela doit être une suggestion directe des mots exacts que l'agent pourrait utiliser.
+   Elle doit être naturelle, persuasive et adaptée au contexte de la conversation.
+
+Vos suggestions doivent être :
+- Brèves et directes (maximum 2-3 phrases par section)
+- Pertinentes pour le moment actuel de la conversation
+- Adaptées au fragment disponible, sans supposer des informations non fournies
+
+Répondez TOUJOURS en français et maintenez ce format à deux sections dans toutes vos réponses.
+"""
+        else:
+            # Default to English for other languages
+            system_content = """
+You are an advanced assistant for sales agents who are on calls with customers.
+IMPORTANT: You are receiving a REAL-TIME transcript of an ongoing conversation. 
+The text is being generated progressively through voice dictation, so you will receive
+incremental fragments of the conversation. Each time, analyze ONLY what you have available so far.
+
+Your response MUST be structured in TWO clearly differentiated sections:
+
+1. INTERPRETATION:
+   In this section, detail what you understand from the conversation fragment so far.
+   Summarize the key points, intentions, concerns, or interests of the customer that you have identified.
+   This section helps the agent confirm that they are correctly understanding the situation.
+
+2. SUGGESTED RESPONSE:
+   Provide a concrete response that the sales agent SHOULD SAY literally.
+   This should be a direct suggestion of the exact words the agent could use.
+   It should be natural, persuasive, and adapted to the context of the conversation.
+
+Your suggestions should be:
+- Brief and direct (maximum 2-3 sentences per section)
+- Relevant to the current moment of the conversation
+- Adapted to the available fragment, without assuming information not provided
+
+ALWAYS respond in the same language as the conversation transcript and maintain this two-section format in all your responses.
+"""
+            
+        # Determine the appropriate prompt based on language
+        if lang_code == 'es':
+            user_prompt = f"Transcripción en curso de una llamada comercial (texto parcial hasta ahora):\n\n{conversation_text}"
+        elif lang_code == 'fr':
+            user_prompt = f"Transcription en cours d'un appel commercial (texte partiel jusqu'à présent):\n\n{conversation_text}"
+        else:
+            user_prompt = f"Ongoing transcription of a sales call (partial text so far):\n\n{conversation_text}"
             
         # Intentar diferentes modelos en orden (sintaxis para versión 0.28.1)
         last_error = None
@@ -66,7 +164,7 @@ Responde SIEMPRE en español y ten en cuenta que la conversación sigue en desar
                     model=model,
                     messages=[
                         {"role": "system", "content": system_content},
-                        {"role": "user", "content": f"Transcripción en curso de una llamada comercial (texto parcial hasta ahora):\n\n{conversation_text}"}
+                        {"role": "user", "content": user_prompt}
                     ],
                     temperature=0.7,
                     max_tokens=150

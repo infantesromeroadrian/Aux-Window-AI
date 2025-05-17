@@ -4,6 +4,7 @@ let recognitionActive = false;
 let transcriptionText = '';
 let suggestionsDebounceTimer;
 let sentimentDebounceTimer;
+let currentLanguage = 'es-ES'; // Default language
 
 // DOM elements for speech recognition
 const startButton = document.getElementById('startButton');
@@ -13,6 +14,8 @@ const liveTranscription = document.getElementById('liveTranscription');
 const liveSuggestions = document.getElementById('liveSuggestions');
 const transcriptionBox = document.getElementById('transcriptionBox');
 const loadingSpinner = document.getElementById('loadingSpinner');
+const languageSelector = document.getElementById('languageSelector');
+const languageMenu = document.getElementById('languageMenu');
 
 // DOM elements for direct questions
 const questionForm = document.getElementById('questionForm');
@@ -47,7 +50,7 @@ function initSpeechRecognition() {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     
     // Configure recognition
-    recognition.lang = 'es-ES';
+    recognition.lang = currentLanguage;
     recognition.continuous = true;
     recognition.interimResults = true;
     
@@ -112,11 +115,44 @@ function initSpeechRecognition() {
     return true;
 }
 
+// Setup language selector
+function setupLanguageSelector() {
+    // Add click event listener to language menu items
+    if (languageMenu) {
+        const languageItems = languageMenu.querySelectorAll('.dropdown-item');
+        languageItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the language code
+                const lang = this.getAttribute('data-lang');
+                currentLanguage = lang;
+                
+                // Update the button text
+                languageSelector.innerHTML = `<i class="bi bi-globe"></i> ${this.textContent}`;
+                
+                // Set active class
+                languageItems.forEach(li => li.classList.remove('active'));
+                this.classList.add('active');
+                
+                // If recognition is active, restart it with the new language
+                if (recognitionActive) {
+                    stopRecognition();
+                    startRecognition();
+                }
+            });
+        });
+    }
+}
+
 // Start voice recognition
 function startRecognition() {
     if (!recognition && !initSpeechRecognition()) {
         return;
     }
+    
+    // Set the current language
+    recognition.lang = currentLanguage;
     
     recognitionActive = true;
     recognition.start();
@@ -194,28 +230,27 @@ function getSuggestions(text) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: text })
+        body: JSON.stringify({ 
+            text: text,
+            language: currentLanguage 
+        })
     })
     .then(response => response.json())
     .then(data => {
         // Hide loading spinner
         loadingSpinner.classList.add('d-none');
         
-        if (data.success && data.suggestions) {
-            liveSuggestions.textContent = data.suggestions;
-        } else if (data.error) {
-            console.error('Error getting suggestions:', data.error);
-            liveSuggestions.textContent = `Error: ${data.error}`;
+        if (data.success) {
+            // Format the suggestions content
+            liveSuggestions.innerHTML = data.suggestions.replace(/\n/g, '<br>');
         } else {
-            console.error('Unknown error getting suggestions:', data);
-            liveSuggestions.textContent = 'No se pudieron obtener sugerencias. Verifica la configuración de la API.';
+            liveSuggestions.textContent = `Error: ${data.error || 'No se pudieron obtener sugerencias.'}`;
         }
     })
     .catch(error => {
-        // Hide loading spinner
+        console.error('Error getting suggestions:', error);
         loadingSpinner.classList.add('d-none');
-        console.error('Error:', error);
-        liveSuggestions.textContent = 'Error de conexión. Inténtalo de nuevo.';
+        liveSuggestions.textContent = 'Error de conexión al obtener sugerencias.';
     });
 }
 
@@ -395,13 +430,17 @@ document.addEventListener('DOMContentLoaded', function() {
     stopButton.addEventListener('click', stopRecognition);
     resetButton.addEventListener('click', resetAll);
     
+    // Setup language selector
+    setupLanguageSelector();
+    
     // Form submission for direct questions
     questionForm.addEventListener('submit', function(event) {
         event.preventDefault();
-        const question = questionInput.value;
-        askQuestion(question);
-        // Clear input field after submission
-        questionInput.value = '';
+        const question = questionInput.value.trim();
+        if (question) {
+            askQuestion(question);
+            questionInput.value = '';
+        }
     });
     
     // Button event listeners for sentiment analysis and call summary
