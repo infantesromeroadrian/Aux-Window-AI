@@ -1,114 +1,71 @@
-# Conversation Transcription System
+# Asistente para Agente Comercial
 
-A Flask-based web application that allows real-time transcription and recording of conversations between agents and clients.
+Herramienta de dictado en tiempo real con sugerencias inteligentes para agentes comerciales durante conversaciones con clientes.
 
-## Features
+## Características
 
-- Real-time conversation transcription using WebSockets
-- Audio recording and speech-to-text conversion
-- Multiple transcription service options (Browser API, Google Speech-to-Text, OpenAI Whisper)
-- Ability to switch between agent and client perspectives
-- Persistent storage of conversations
-- Export functionality for transcripts
-- Mobile-friendly responsive design
+- Dictado de voz en tiempo real
+- Transcripción de texto en vivo
+- Sugerencias inteligentes basadas en el contenido de la conversación usando GPT-4.1
+- Interfaz web simple y responsive
 
-## Architecture
+## Requisitos
 
-The application follows a modular architecture with clear separation of concerns:
+- Docker y Docker Compose
+- Conexión a Internet
+- Navegador moderno (Chrome, Edge o Safari recomendados)
+- Clave API de OpenAI
 
-- **Models**: Define data structures for conversations and messages
-- **Services**: Handle business logic, data persistence, and transcription services
-- **Controllers**: Manage HTTP and WebSocket routes
-- **Templates**: Render the user interface
-- **Static Files**: CSS styles and client-side JavaScript
+## Configuración
 
-## Tech Stack
+1. Clonar este repositorio
+2. Crear un archivo `.env` en la raíz del proyecto con el siguiente contenido:
 
-- **Backend**: Flask, Flask-SocketIO
-- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
-- **Database**: File-based JSON storage
-- **Speech-to-Text**: Web Speech API, Google Speech-to-Text, OpenAI Whisper
-- **Containerization**: Docker with Docker Compose
+```
+# OpenAI API Configuration
+OPENAI_API_KEY=tu_clave_api_de_openai_aqui
 
-## Getting Started
-
-### Prerequisites
-
-- Docker
-- Docker Compose
-- (Optional) API keys for transcription services:
-  - Google Cloud Speech-to-Text API key
-  - OpenAI API key for Whisper
-
-### Running the Application
-
-1. Clone this repository
-2. Navigate to the project directory
-3. (Optional) Configure your API keys in docker-compose.yml
-4. Run the application using Docker Compose:
-
-```bash
-docker-compose up --build
+# Flask Configuration
+FLASK_APP=src/main.py
+FLASK_ENV=development
+FLASK_DEBUG=1
 ```
 
-5. Access the application at http://localhost:8501
+3. Reemplazar `tu_clave_api_de_openai_aqui` con tu clave API real de OpenAI
 
-## Configuration
+## Iniciar la aplicación
 
-The application can be configured using environment variables in the docker-compose.yml file:
+```bash
+# Construir e iniciar los contenedores
+docker-compose up -d
 
-- `TRANSCRIPTION_SERVICE`: The transcription service to use (`speechrecognition`, `google`, `whisper`)
-- `LANGUAGE_CODE`: The language code for transcription (default: `es-ES`)
-- `OPENAI_API_KEY`: Your OpenAI API key for Whisper (if using Whisper)
-- `GOOGLE_APPLICATION_CREDENTIALS`: Path to your Google Cloud credentials file (if using Google Speech-to-Text)
+# Ver logs de la aplicación
+docker-compose logs -f
+```
 
-## Development
+La aplicación estará disponible en: http://localhost:8501
 
-### Project Structure
+## Uso
+
+1. Abre la aplicación en tu navegador
+2. Haz clic en "Iniciar dictado"
+3. Comienza a hablar y verás la transcripción en tiempo real
+4. Las sugerencias aparecerán automáticamente basadas en el contenido de la conversación
+5. Haz clic en "Detener" cuando desees finalizar la grabación
+
+## Estructura del proyecto
 
 ```
 Sandetel-RAG-Solution/
-├── src/
-│   ├── models/
-│   │   └── conversation.py
-│   ├── utils/
-│   │   ├── config.py
-│   │   └── helpers.py
-│   ├── services/
-│   │   ├── conversation_service.py
-│   │   └── transcription_service.py
-│   ├── controllers/
-│   │   └── transcription_controller.py
-│   └── main.py
-├── static/
-│   └── css/
-│       └── style.css
-├── templates/
-│   ├── index.html
-│   └── conversation.html
-├── data/
-│   └── conversations/
-├── docker-compose.yml
-├── Dockerfile
-└── requirements.txt
-```
-
-### Speech-to-Text Options
-
-The application supports three options for speech-to-text conversion:
-
-1. **SpeechRecognition**: Uses the Web Speech API in the browser or the `SpeechRecognition` Python library on the server.
-2. **Google Speech-to-Text**: Uses Google's Cloud Speech-to-Text API for high-quality transcription.
-3. **OpenAI Whisper**: Uses OpenAI's powerful Whisper model for transcription.
-
-To configure a different service, set the `TRANSCRIPTION_SERVICE` environment variable in docker-compose.yml.
-
-### Running Tests
-
-```bash
-docker-compose run transcription-app python -m pytest
-```
-
-## License
-
-This project is licensed under the MIT License. 
+├── src/                      # Código fuente
+│   ├── static/               # Archivos estáticos (CSS, JS)
+│   │   ├── css/
+│   │   └── js/
+│   ├── templates/            # Plantillas HTML
+│   ├── services/             # Servicios (OpenAI, etc.)
+│   └── main.py               # Punto de entrada principal
+├── Dockerfile                # Configuración de Docker
+├── docker-compose.yml        # Configuración de Docker Compose
+├── requirements.txt          # Dependencias de Python
+└── .env                      # Variables de entorno (no incluido en el repo)
+``` 

@@ -1,19 +1,15 @@
 version: '3.8'
 
 services:
-  transcription-app:
+  web:
     build: .
     ports:
-      - "8501:5000"
+      - "8501:8501"
     volumes:
-      - ./:/app
+      - .:/app
     environment:
       - FLASK_ENV=development
-      - FLASK_APP=src/main.py
       - FLASK_DEBUG=1
-      - SECRET_KEY=transcription-app-secret-key
-      - TRANSCRIPTION_SERVICE=speechrecognition
-      - LANGUAGE_CODE=es-ES
-      # Uncomment and add your API keys if using external services
-      # - OPENAI_API_KEY=your_openai_api_key
-      # - GOOGLE_APPLICATION_CREDENTIALS=/app/google-credentials.json 
+    env_file:
+      - .env
+    restart: unless-stopped 

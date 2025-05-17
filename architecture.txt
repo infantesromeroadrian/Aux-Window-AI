@@ -1,0 +1,39 @@
++-------------------------------+                 +------------------+
+|          Web Browser         |                 |   OpenAI API      |
+|-------------------------------|                 |------------------|
+| - Speech Recognition (JS)     |                 | - GPT-4.1 Model  |
+| - Real-time UI Updates        <----------------->                  |
++---------------^---------------+                 +------------------+
+                |
+                | HTTP/WebSocket
+                |
++---------------v---------------+
+|      Flask Web Server         |
+|-------------------------------|
+| - API Endpoints               |
+| - HTML Templates              |
+| - Static Files (CSS, JS)      |
++-------------------------------+
+         |            |
+         |            |
++--------v--+    +----v-------+
+| Templates |    | Services   |
+|-----------|    |------------|
+| - index   |    | - OpenAI   |
++-----------+    +------------+
+
+
++----------------------------------------------------------+
+|                  Application Flow                         |
+|----------------------------------------------------------|
+| 1. User opens web app in browser                         |
+| 2. User clicks "Start Dictation" button                  |
+| 3. Browser captures audio using Speech Recognition API   |
+| 4. Transcribed text is displayed in real-time            |
+| 5. Text is sent to server for LLM processing             |
+| 6. Server calls OpenAI API with the text                 |
+| 7. GPT-4.1 generates suggestions based on conversation   |
+| 8. Suggestions are returned to the browser and displayed |
+| 9. Steps 3-8 repeat continuously while dictating         |
+| 10. User clicks "Stop" button to end dictation           |
++----------------------------------------------------------+ 
