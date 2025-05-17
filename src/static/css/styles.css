@@ -5,18 +5,24 @@ body {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1200px;
+}
+
+/* Session Info */
+.session-info {
+    font-size: 0.9rem;
 }
 
 /* Transcription Box */
 #transcriptionBox {
-    min-height: 200px;
+    min-height: 180px;
     border: 1px solid #dee2e6;
     background-color: white;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 #liveTranscription {
-    min-height: 180px;
     color: #212529;
     font-size: 1.1rem;
     line-height: 1.6;
@@ -27,6 +33,8 @@ body {
     min-height: 150px;
     border: 1px solid #dee2e6;
     background-color: white;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 #liveSuggestions {
@@ -40,7 +48,7 @@ body {
     min-height: 150px;
     border: 1px solid #dee2e6;
     background-color: white;
-    max-height: 300px;
+    max-height: 250px;
     overflow-y: auto;
 }
 
@@ -57,6 +65,51 @@ body {
 
 #questionInput {
     font-size: 1.1rem;
+}
+
+/* Sentiment Analysis Box */
+#sentimentBox {
+    min-height: 180px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#sentimentAnalysis {
+    color: #212529;
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+/* Call Summary Box */
+#summaryBox {
+    min-height: 250px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#callSummary {
+    color: #212529;
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.75rem 1rem;
 }
 
 /* Buttons */
@@ -83,19 +136,54 @@ body {
     animation: blink 1.5s infinite;
 }
 
+/* Live indicator animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+#sentimentStatusIndicator {
+    animation: pulse 2s infinite;
+}
+
+#sentimentStatusIndicator i {
+    margin-right: 3px;
+}
+
 /* Loading spinner */
 .spinner-border {
     width: 1.5rem;
     height: 1.5rem;
 }
 
+/* Modal */
+.modal-content {
+    border-radius: 0.5rem;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+}
+
 /* Responsive adjustments */
+@media (max-width: 992px) {
+    .container {
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
-    #transcriptionBox, #suggestionsBox, #answerBox {
-        min-height: 150px;
+    #transcriptionBox, #suggestionsBox, #answerBox, #sentimentBox, #summaryBox {
+        min-height: 120px;
+        max-height: 200px;
     }
     
-    #liveTranscription, #liveSuggestions, #assistantAnswer {
+    #liveTranscription, #liveSuggestions, #assistantAnswer, #sentimentAnalysis, #callSummary {
         font-size: 1rem;
+    }
+    
+    .session-info {
+        font-size: 0.8rem;
     }
 } 

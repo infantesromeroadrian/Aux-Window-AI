@@ -10,26 +10,35 @@
 </head>
 <body>
     <div class="container">
-        <div class="row mt-5">
-            <div class="col-12 text-center">
-                <h1>Asistente para Conversación con Clientes</h1>
-                <p class="lead">Herramienta de dictado en tiempo real con sugerencias inteligentes</p>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="h2">Asistente para Conversación con Clientes</h1>
+                    <div class="session-info">
+                        <span class="badge bg-info text-dark me-2">Sesión: <span id="sessionId">{{ session_id }}</span></span>
+                        <span class="badge bg-secondary">Inicio: <span id="sessionTime">{{ start_time }}</span></span>
+                        <button id="newSessionBtn" class="btn btn-sm btn-outline-primary ms-2" title="Iniciar nueva conversación">
+                            <i class="bi bi-plus-circle"></i> Nueva
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Sección de Transcripción -->
+                <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Transcripción en vivo</h5>
                         <div>
-                            <button id="startButton" class="btn btn-success">
+                            <button id="startButton" class="btn btn-success btn-sm">
                                 <i class="bi bi-mic-fill"></i> Iniciar dictado
                             </button>
-                            <button id="stopButton" class="btn btn-danger" disabled>
+                            <button id="stopButton" class="btn btn-danger btn-sm" disabled>
                                 <i class="bi bi-stop-fill"></i> Detener
                             </button>
-                            <button id="resetButton" class="btn btn-secondary">
+                            <button id="resetButton" class="btn btn-secondary btn-sm">
                                 <i class="bi bi-arrow-counterclockwise"></i> Reiniciar
                             </button>
                         </div>
@@ -40,12 +49,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
+                <!-- Sección de Sugerencias -->
+                <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Sugerencias del asistente</h5>
                         <div id="loadingSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status">
@@ -58,13 +64,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Nuevo cuadro para preguntas directas -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
+                
+                <!-- Sección de Preguntas -->
+                <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Preguntas al asistente</h5>
                         <div id="questionLoadingSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status">
@@ -84,6 +86,72 @@
                             <p id="assistantAnswer">Las respuestas a tus preguntas aparecerán aquí...</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Sección de Análisis de Sentimiento -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-info text-dark">
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-0">Análisis de Sentimiento</h5>
+                            <span id="sentimentStatusIndicator" class="badge bg-success ms-2 d-none">
+                                <i class="bi bi-broadcast"></i> En vivo
+                            </span>
+                        </div>
+                        <div>
+                            <button id="analyzeSentimentBtn" class="btn btn-sm btn-dark">
+                                <i class="bi bi-emoji-smile"></i> Analizar
+                            </button>
+                            <div id="sentimentLoadingSpinner" class="spinner-border spinner-border-sm text-dark d-none" role="status">
+                                <span class="visually-hidden">Analizando...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="sentimentBox" class="p-3 bg-light rounded">
+                            <p id="sentimentAnalysis">El análisis de sentimiento aparecerá aquí...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección de Resumen de Llamada -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+                        <h5>Resumen de la Llamada</h5>
+                        <div>
+                            <button id="generateSummaryBtn" class="btn btn-sm btn-light">
+                                <i class="bi bi-file-earmark-text"></i> Generar
+                            </button>
+                            <div id="summaryLoadingSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                                <span class="visually-hidden">Generando...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="summaryBox" class="p-3 bg-light rounded">
+                            <p id="callSummary">El resumen de la llamada aparecerá aquí...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar nueva sesión -->
+    <div class="modal fade" id="newSessionModal" tabindex="-1" aria-labelledby="newSessionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newSessionModalLabel">Iniciar Nueva Conversación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas iniciar una nueva conversación? La conversación actual se guardará, pero todos los campos se reiniciarán.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmNewSession">Iniciar Nueva</button>
                 </div>
             </div>
         </div>
