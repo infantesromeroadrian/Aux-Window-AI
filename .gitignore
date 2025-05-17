@@ -1,0 +1,59 @@
+# Archivos de entorno
+.env
+.env.*
+!.env.example
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos de Docker
+.docker/
+docker-compose.override.yml
+
+# Archivos de bases de datos
+*.sqlite3
+*.db
+
+# Archivos de registro
+logs/
+*.log
+
+# Directorios virtuales
+venv/
+ENV/
+
+# Directorios de caché
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Archivos específicos de este proyecto
+data/conversations/*
+!data/conversations/.gitkeep 
